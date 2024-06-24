@@ -1,3 +1,5 @@
+import tkinter as tk
+from tkinter import messagebox
 import time
 import csv
 
@@ -5,10 +7,9 @@ class SistemaMonitoramento:
     def __init__(self):
         self.dados = []
 
-    def coletar_dados(self):
-        temperatura = float(input("Digite a temperatura (em °C): "))
-        ph = float(input("Digite o valor de pH: "))
-        return {'Temperatura': temperatura, 'PH': ph, 'Timestamp': time.time()}
+    def coletar_dados(self, temperatura, ph):
+        timestamp = time.time()
+        return {'Temperatura': temperatura, 'PH': ph, 'Timestamp': timestamp}
 
     def avaliar_qualidade_agua(self, temperatura, ph):
         if 0 <= temperatura <= 40 and 6.5 <= ph <= 8.5:
@@ -35,18 +36,42 @@ class SistemaMonitoramento:
     def iniciar_monitoramento(self, duracao, intervalo):
         tempo_inicial = time.time()
         while (time.time() - tempo_inicial) < duracao:
-            dados = self.coletar_dados()
+            temperatura, ph = self.obter_dados_gui()
+            dados = self.coletar_dados(temperatura, ph)
             self.dados.append(dados)
             print("Dados coletados:", dados)
-            temperatura = dados['Temperatura']
-            ph = dados['PH']
             resultado_avaliacao = self.avaliar_qualidade_agua(temperatura, ph)
             print(resultado_avaliacao)
             self.salvar_dados()
             time.sleep(intervalo)
 
-if __name__ == "__main__":
-    sistema = SistemaMonitoramento()
-    duracao_monitoramento = int(input("Digite a duração do monitoramento (em segundos): "))
-    intervalo_leitura = int(input("Digite o intervalo entre as leituras (em segundos): "))
+    def obter_dados_gui(self):
+        # Aqui você poderá implementar a interface gráfica para obter os dados
+        # Por enquanto, vamos retornar valores fixos para fins de demonstração
+        return 25.0, 7.0  # Exemplo de temperatura e pH fixos
+
+def iniciar_monitoramento_gui():
+    duracao_monitoramento = int(entry_duracao.get())
+    intervalo_leitura = int(entry_intervalo.get())
     sistema.iniciar_monitoramento(duracao_monitoramento, intervalo_leitura)
+
+# Configuração da interface gráfica usando tkinter
+root = tk.Tk()
+root.title("Monitoramento de Qualidade da Água")
+
+label_duracao = tk.Label(root, text="Digite a duração do monitoramento (segundos):")
+label_duracao.pack()
+entry_duracao = tk.Entry(root)
+entry_duracao.pack()
+
+label_intervalo = tk.Label(root, text="Digite o intervalo entre as leituras (segundos):")
+label_intervalo.pack()
+entry_intervalo = tk.Entry(root)
+entry_intervalo.pack()
+
+button_iniciar = tk.Button(root, text="Iniciar Monitoramento", command=iniciar_monitoramento_gui)
+button_iniciar.pack()
+
+sistema = SistemaMonitoramento()
+
+root.mainloop()
